@@ -1,0 +1,46 @@
+{
+  "name": "MatchRequest",
+  "type": "object",
+  "properties": {
+    "from_user": {
+      "type": "string",
+      "description": "Email of the user sending the request"
+    },
+    "to_user": {
+      "type": "string",
+      "description": "Email of the user receiving the request"
+    },
+    "from_memory_id": {
+      "type": "string",
+      "description": "TimeMemory ID of sender"
+    },
+    "to_memory_id": {
+      "type": "string",
+      "description": "TimeMemory ID of receiver"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined",
+        "blocked"
+      ],
+      "default": "pending",
+      "description": "Status of the match request"
+    },
+    "match_summary": {
+      "type": "string",
+      "description": "Human-readable match summary"
+    },
+    "match_score": {
+      "type": "number",
+      "description": "Match score percentage"
+    }
+  },
+  "required": [
+    "from_user",
+    "to_user",
+    "status"
+  ]
+}

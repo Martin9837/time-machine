@@ -1,0 +1,33 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "match_request_id": {
+      "type": "string",
+      "description": "ID of the accepted match request"
+    },
+    "sender": {
+      "type": "string",
+      "description": "Email of the sender"
+    },
+    "receiver": {
+      "type": "string",
+      "description": "Email of the receiver"
+    },
+    "content": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the message has been read"
+    }
+  },
+  "required": [
+    "match_request_id",
+    "sender",
+    "receiver",
+    "content"
+  ]
+}

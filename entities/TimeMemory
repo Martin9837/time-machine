@@ -1,0 +1,79 @@
+{
+  "name": "TimeMemory",
+  "type": "object",
+  "properties": {
+    "year": {
+      "type": "number",
+      "description": "The year of the memory"
+    },
+    "month": {
+      "type": "number",
+      "description": "The month of the memory (1-12)",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "city": {
+      "type": "string",
+      "description": "City where the memory took place"
+    },
+    "area": {
+      "type": "string",
+      "description": "Optional area or locality"
+    },
+    "contexts": {
+      "type": "array",
+      "description": "What user was associated with (school, college, company, society, other)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "context_details": {
+      "type": "object",
+      "description": "Answers to context-based questions keyed by context type",
+      "additionalProperties": true
+    },
+    "institution_name": {
+      "type": "string",
+      "description": "Name of school/college/company/society"
+    },
+    "memory_answers": {
+      "type": "array",
+      "description": "Answers to memory questions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "current_city": {
+      "type": "string",
+      "description": "User's current city"
+    },
+    "open_to_connect": {
+      "type": "boolean",
+      "description": "Whether user is open to connecting"
+    },
+    "nickname": {
+      "type": "string",
+      "description": "Display nickname for privacy"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Extracted keywords for matching",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "year",
+    "city",
+    "contexts"
+  ]
+}
