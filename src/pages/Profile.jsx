@@ -82,9 +82,10 @@ export default function Profile() {
           <Button
             onClick={() => base44.auth.logout()}
             variant="ghost"
-            className="h-12 rounded-2xl text-gray-400 hover:text-red-500 hover:bg-red-50 gap-2"
+            className="h-12 px-4 rounded-2xl text-red-400 hover:text-red-600 hover:bg-red-50 gap-2 font-semibold border border-red-100"
           >
             <LogOut className="w-4 h-4" />
+            Sign Out
           </Button>
         </div>
 

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="108dp"
+            android:height="108dp"
+            android:viewportWidth="108"
+            android:viewportHeight="108">
+
+            <!-- Dark background circle -->
+            <path
+                android:fillColor="#060612"
+                android:pathData="M54,54m-54,0a54,54 0,1 1,108 0a54,54 0,1 1,-108 0" />
+
+            <!-- Outer glow ring -->
+            <path
+                android:fillColor="#00000000"
+                android:strokeColor="#7c3aed"
+                android:strokeWidth="1.5"
+                android:strokeAlpha="0.5"
+                android:pathData="M54,54m-46,0a46,46 0,1 1,92 0a46,46 0,1 1,-92 0" />
+
+            <!-- Clock face -->
+            <path
+                android:fillColor="#1a0a2e"
+                android:strokeColor="#7c3aed"
+                android:strokeWidth="2"
+                android:pathData="M54,54m-28,0a28,28 0,1 1,56 0a28,28 0,1 1,-56 0" />
+
+            <!-- Hour markers -->
+            <path android:fillColor="#a78bfa" android:pathData="M54,30 L52.5,26 L55.5,26 Z" />
+            <path android:fillColor="#6d5f9e" android:pathData="M78,54 L82,52.5 L82,55.5 Z" />
+            <path android:fillColor="#6d5f9e" android:pathData="M54,78 L52.5,82 L55.5,82 Z" />
+            <path android:fillColor="#6d5f9e" android:pathData="M30,54 L26,52.5 L26,55.5 Z" />
+
+            <!-- Minute hand (rotating group) -->
+            <group
+                android:name="minuteHand"
+                android:pivotX="54"
+                android:pivotY="54"
+                android:rotation="0">
+                <path
+                    android:fillColor="#c4b5fd"
+                    android:pathData="M53,54 L53,30 L55,30 L55,54 Z"
+                    android:strokeLineCap="round" />
+            </group>
+
+            <!-- Hour hand (rotating group, slower) -->
+            <group
+                android:name="hourHand"
+                android:pivotX="54"
+                android:pivotY="54"
+                android:rotation="120">
+                <path
+                    android:fillColor="#ffffff"
+                    android:pathData="M53,54 L53,37 L55,37 L55,54 Z"
+                    android:strokeLineCap="round" />
+            </group>
+
+            <!-- Center dot -->
+            <path
+                android:fillColor="#7c3aed"
+                android:pathData="M54,54m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0" />
+            <path
+                android:fillColor="#ffffff"
+                android:pathData="M54,54m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+
+        </vector>
+    </aapt:attr>
+
+    <!-- Rotate minute hand continuously -->
+    <target android:name="minuteHand">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="rotation"
+                android:valueFrom="0"
+                android:valueTo="360"
+                android:duration="2000"
+                android:repeatCount="infinite"
+                android:interpolator="@android:interpolator/linear" />
+        </aapt:attr>
+    </target>
+
+    <!-- Rotate hour hand (slower) -->
+    <target android:name="hourHand">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="rotation"
+                android:valueFrom="120"
+                android:valueTo="480"
+                android:duration="24000"
+                android:repeatCount="infinite"
+                android:interpolator="@android:interpolator/linear" />
+        </aapt:attr>
+    </target>
+
+</animated-vector>

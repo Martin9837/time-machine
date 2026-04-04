@@ -62,14 +62,14 @@ export default function YearCityStep({ data, onChange }) {
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">Year</Label>
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">From Year</Label>
             <div className="relative">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
               <Input
                 type="number"
                 min={1940}
                 max={new Date().getFullYear()}
-                placeholder="1993"
+                placeholder="1990"
                 value={data.year || ""}
                 onChange={(e) => onChange({ ...data, year: parseInt(e.target.value) || "" })}
                 className="pl-12 h-14 rounded-2xl border-gray-200 bg-white text-lg font-semibold focus:ring-violet-500 focus:border-violet-500"
@@ -77,25 +77,41 @@ export default function YearCityStep({ data, onChange }) {
             </div>
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Month <span className="text-gray-400 font-normal">(optional)</span>
-            </Label>
-            <Select
-              value={data.month?.toString() || ""}
-              onValueChange={(val) => onChange({ ...data, month: parseInt(val) })}
-            >
-              <SelectTrigger className="h-14 rounded-2xl border-gray-200 bg-white text-base focus:ring-violet-500">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                {months.map((m) => (
-                  <SelectItem key={m.value} value={m.value.toString()}>
-                    {m.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">To Year</Label>
+            <div className="relative">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
+              <Input
+                type="number"
+                min={1940}
+                max={new Date().getFullYear()}
+                placeholder="1995"
+                value={data.year_end || ""}
+                onChange={(e) => onChange({ ...data, year_end: parseInt(e.target.value) || "" })}
+                className="pl-12 h-14 rounded-2xl border-gray-200 bg-white text-lg font-semibold focus:ring-violet-500 focus:border-violet-500"
+              />
+            </div>
           </div>
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium text-gray-700 mb-2 block">
+            Month <span className="text-gray-400 font-normal">(optional)</span>
+          </Label>
+          <Select
+            value={data.month?.toString() || ""}
+            onValueChange={(val) => onChange({ ...data, month: parseInt(val) })}
+          >
+            <SelectTrigger className="h-14 rounded-2xl border-gray-200 bg-white text-base focus:ring-violet-500">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((m) => (
+                <SelectItem key={m.value} value={m.value.toString()}>
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div>

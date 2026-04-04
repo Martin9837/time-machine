@@ -10,12 +10,18 @@ import YearCityStep from "../components/time-machine/YearCityStep";
 import ContextStep from "../components/time-machine/ContextStep";
 import MemoryQuestionsStep from "../components/time-machine/MemoryQuestionsStep";
 import PresentDayStep from "../components/time-machine/PresentDayStep";
+import GlobeRevealMap from "../components/time-machine/GlobeRevealMap";
 
 export default function TimeMachine() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [showGlobe, setShowGlobe] = useState(false);
+  const [savedMemory, setSavedMemory] = useState(null);
+  const [allMemories, setAllMemories] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [data, setData] = useState({
     year: "",
+    year_end: "",
     month: null,
     city: "",
     area: "",
@@ -29,9 +35,7 @@ export default function TimeMachine() {
 
   useEffect(() => {
     base44.auth.me().then((user) => {
-      if (user.full_name) {
-        setData((d) => ({ ...d, nickname: d.nickname || user.full_name.split(" ")[0] }));
-      }
+      setCurrentUser(user);
     });
   }, []);
 
@@ -47,7 +51,6 @@ export default function TimeMachine() {
     setSaving(true);
     const user = await base44.auth.me();
 
-    // Extract keywords from answers
     const keywords = Object.values(data.memory_answers || {})
       .filter(Boolean)
       .join(" ")
@@ -55,20 +58,19 @@ export default function TimeMachine() {
       .split(/\s+/)
       .filter((w) => w.length > 3);
 
-    // Find institution name from answers
     const institutionKey = Object.keys(data.memory_answers || {}).find((k) =>
       k.includes("institution_name")
     );
     const institutionName = institutionKey ? data.memory_answers[institutionKey] : "";
 
-    // Build memory_answers as array
     const memoryAnswersArr = Object.entries(data.memory_answers || {}).map(([key, value]) => ({
       question: key,
       answer: value,
     }));
 
-    await base44.entities.TimeMemory.create({
+    const saved = await base44.entities.TimeMemory.create({
       year: data.year,
+      year_end: data.year_end || null,
       month: data.month || null,
       city: data.city,
       area: data.area || "",
@@ -81,8 +83,13 @@ export default function TimeMachine() {
       keywords: [...new Set(keywords)],
     });
 
+    // Fetch all open memories for the globe map
+    const others = await base44.entities.TimeMemory.filter({ open_to_connect: true });
+
+    setSavedMemory({ ...data, id: saved?.id, created_by: user.email });
+    setAllMemories(others);
     setSaving(false);
-    navigate(createPageUrl("Discover"));
+    setShowGlobe(true);
   };
 
   const steps = [
@@ -93,58 +100,69 @@ export default function TimeMachine() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6]">
-      <div className="max-w-lg mx-auto px-5 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          {step > 0 ? (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-          ) : (
+    <>
+      {showGlobe && (
+        <GlobeRevealMap
+          myMemory={savedMemory}
+          allMemories={allMemories}
+          user={currentUser}
+          onContinue={() => navigate(createPageUrl("Discover"))}
+        />
+      )}
+
+      <div className="min-h-screen bg-[#FAF9F6]">
+        <div className="max-w-lg mx-auto px-5 py-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            {step > 0 ? (
+              <button
+                onClick={() => setStep(step - 1)}
+                className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </button>
+            ) : (
+              <div className="w-10" />
+            )}
+            <StepIndicator currentStep={step} totalSteps={4} />
             <div className="w-10" />
-          )}
-          <StepIndicator currentStep={step} totalSteps={4} />
-          <div className="w-10" />
-        </div>
+          </div>
 
-        {/* Step Content */}
-        <AnimatePresence mode="wait">
-          <div key={step}>{steps[step]}</div>
-        </AnimatePresence>
+          {/* Step Content */}
+          <AnimatePresence mode="wait">
+            <div key={step}>{steps[step]}</div>
+          </AnimatePresence>
 
-        {/* Actions */}
-        <div className="mt-8 pb-6">
-          {step < 3 ? (
-            <Button
-              disabled={!canNext()}
-              onClick={() => setStep(step + 1)}
-              className="w-full h-14 rounded-2xl bg-[#1e1144] hover:bg-[#2d1a6b] text-white font-semibold text-base gap-2 disabled:opacity-40"
-            >
-              Continue
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-          ) : (
-            <Button
-              disabled={!canNext() || saving}
-              onClick={handleSave}
-              className="w-full h-14 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold text-base gap-2 disabled:opacity-40 shadow-lg shadow-violet-200"
-            >
-              {saving ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <Rocket className="w-5 h-5" />
-                  Launch Time Machine
-                </>
-              )}
-            </Button>
-          )}
+          {/* Actions */}
+          <div className="mt-8 pb-6">
+            {step < 3 ? (
+              <Button
+                disabled={!canNext()}
+                onClick={() => setStep(step + 1)}
+                className="w-full h-14 rounded-2xl bg-[#1e1144] hover:bg-[#2d1a6b] text-white font-semibold text-base gap-2 disabled:opacity-40"
+              >
+                Continue
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            ) : (
+              <Button
+                disabled={!canNext() || saving}
+                onClick={handleSave}
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold text-base gap-2 disabled:opacity-40 shadow-lg shadow-violet-200"
+              >
+                {saving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Rocket className="w-5 h-5" />
+                    Launch Time Machine
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
