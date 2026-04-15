@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import { MapPin, LocateFixed } from "lucide-react";
 import "leaflet/dist/leaflet.css";
@@ -41,6 +41,64 @@ const customIcon = L.divIcon({
   iconAnchor: [20, 40],
 });
 
+// Default fallback — Sweden instead of India
+const SWEDEN_CENTER = [59.33, 18.07];
+
+/**
+ * Extract the best "area/locality" string from a Nominatim address object.
+ * Priority: suburb > village > city_district > neighbourhood > quarter
+ * We deliberately skip amenity/building/road fields which contain POI names.
+ */
+function extractArea(address) {
+  return (
+    address?.suburb ||
+    address?.village ||
+    address?.city_district ||
+    address?.neighbourhood ||
+    address?.quarter ||
+    ""
+  );
+}
+
+/**
+ * Reverse-geocode with zoom=14 so we get building-level address detail,
+ * but still extract the correct suburb/neighbourhood — not the building name.
+ */
+async function reverseGeocode(lat, lng) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=14`
+  );
+  const data = await res.json();
+
+  const city =
+    data.address?.city ||
+    data.address?.town ||
+    data.address?.municipality ||
+    data.address?.village ||
+    data.address?.state_district ||
+    data.address?.state ||
+    "";
+
+  const area = extractArea(data.address);
+
+  return { city, area };
+}
+
+/**
+ * Forward-geocode a city name → [lat, lng].
+ * Used to pre-center the map on the city the user already typed.
+ */
+async function geocodeCity(cityName) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`
+    );
+    const data = await res.json();
+    if (data.length > 0) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+  } catch {}
+  return null;
+}
+
 function LocationMarker({ position, onLocationSelect }) {
   useMapEvents({
     click(e) {
@@ -48,45 +106,62 @@ function LocationMarker({ position, onLocationSelect }) {
       onLocationSelect(lat, lng);
     },
   });
-
   return position ? <Marker position={position} icon={customIcon} /> : null;
 }
 
 function FlyToLocation({ coords }) {
   const map = useMap();
-  if (coords) {
-    map.flyTo(coords, 13, { animate: true });
-  }
+  useEffect(() => {
+    if (coords) map.flyTo(coords, 13, { animate: true });
+  }, [coords, map]);
   return null;
 }
 
-export default function LocationMapPicker({ position, onLocationSelect, onClose }) {
-  const [markerPos, setMarkerPos] = useState(position || null);
-  const [flyTo, setFlyTo] = useState(null);
-  const [locating, setLocating] = useState(false);
-  const center = position || [20.5937, 78.9629];
+export default function LocationMapPicker({ position, cityHint, onLocationSelect, onClose }) {
+  const [markerPos, setMarkerPos]   = useState(position || null);
+  const [flyTo, setFlyTo]           = useState(null);
+  const [locating, setLocating]     = useState(false);
+  // Start at the passed position, or Sweden — resolved below via geocode / geolocation
+  const [center, setCenter]         = useState(position || SWEDEN_CENTER);
+  const [initialZoom, setInitialZoom] = useState(position ? 13 : 5);
+
+  // On mount: try to set a sensible initial map center
+  useEffect(() => {
+    if (position) return; // already have coordinates — nothing to do
+
+    // 1. If a city name was typed, geocode it for a precise center
+    if (cityHint) {
+      geocodeCity(cityHint).then((coords) => {
+        if (coords) {
+          setCenter(coords);
+          setInitialZoom(12);
+        }
+      });
+      return;
+    }
+
+    // 2. Try silent geolocation (no prompt — browser may serve from cache)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = [pos.coords.latitude, pos.coords.longitude];
+          setCenter(coords);
+          setInitialZoom(12);
+        },
+        () => {
+          // Permission denied or unavailable — stay on Sweden default
+        },
+        { timeout: 4000, maximumAge: 60000 }
+      );
+    }
+  }, []); // intentionally empty — runs once on mount only
 
   const handleLocationClick = async (lat, lng) => {
     setMarkerPos([lat, lng]);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-      const data = await response.json();
-
-      const city = data.address?.city ||
-                   data.address?.town ||
-                   data.address?.village ||
-                   data.address?.state_district ||
-                   data.address?.state || "";
-
-      const area = data.address?.suburb ||
-                   data.address?.neighbourhood ||
-                   data.address?.quarter || "";
-
+      const { city, area } = await reverseGeocode(lat, lng);
       onLocationSelect({ lat, lng, city, area });
-    } catch (error) {
-      console.error("Geocoding error:", error);
+    } catch {
       onLocationSelect({ lat, lng, city: "", area: "" });
     }
   };
@@ -144,7 +219,7 @@ export default function LocationMapPicker({ position, onLocationSelect, onClose 
         <div className="h-[460px] relative">
           <MapContainer
             center={center}
-            zoom={position ? 12 : 5}
+            zoom={initialZoom}
             style={{ height: "100%", width: "100%" }}
             zoomControl={true}
           >
@@ -159,7 +234,7 @@ export default function LocationMapPicker({ position, onLocationSelect, onClose 
 
         <div className="p-4 bg-gray-50 text-center">
           <p className="text-xs text-gray-500">
-            Click on the map to select your location. City and area will be detected automatically.
+            Click on the map to select your location. City and neighbourhood will be detected automatically.
           </p>
         </div>
       </div>

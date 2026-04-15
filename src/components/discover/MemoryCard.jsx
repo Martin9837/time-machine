@@ -5,16 +5,20 @@ import { motion } from "framer-motion";
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function MemoryCard({ memory, onClick, index = 0 }) {
-  const gradients = [
-    "from-violet-600 to-indigo-600",
-    "from-rose-500 to-orange-500",
-    "from-emerald-500 to-teal-600",
-    "from-amber-500 to-yellow-500",
-    "from-blue-500 to-cyan-500",
-  ];
+// Match the same palette used in ContextStep so colours are consistent
+const CATEGORY_GRADIENTS = {
+  school:   "from-blue-500 to-blue-700",
+  college:  "from-violet-600 to-purple-700",
+  company:  "from-emerald-500 to-teal-600",
+  society:  "from-amber-500 to-yellow-600",
+  other:    "from-slate-500 to-gray-700",
+};
+const FALLBACK_GRADIENT = "from-blue-500 to-blue-700";
 
-  const gradient = gradients[index % gradients.length];
+export default function MemoryCard({ memory, onClick, index = 0 }) {
+  // Use the first (primary) context to pick the colour; fall back to blue
+  const primaryContext = memory.contexts?.[0];
+  const gradient = CATEGORY_GRADIENTS[primaryContext] ?? FALLBACK_GRADIENT;
 
   return (
     <motion.div

@@ -1,0 +1,64 @@
+/* ── Cosmic Clock Animations ─────────────────────────────────────── */
+
+@keyframes cosmic-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes cosmic-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes cosmic-pulse-glow {
+  0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 6px #00aaff) drop-shadow(0 0 18px #0044cc); }
+  50%       { opacity: 1;    filter: drop-shadow(0 0 14px #00ddff) drop-shadow(0 0 36px #0088ff); }
+}
+@keyframes cosmic-center-pulse {
+  0%, 100% { r: 12; opacity: 0.9; filter: drop-shadow(0 0 10px #00ccff) drop-shadow(0 0 30px #0055ff); }
+  50%       { r: 14; opacity: 1;   filter: drop-shadow(0 0 20px #00ffff) drop-shadow(0 0 50px #0099ff); }
+}
+@keyframes cosmic-beam {
+  0%, 100% { opacity: 0.20; }
+  50%       { opacity: 0.65; }
+}
+@keyframes cosmic-orb-float {
+  0%, 100% { transform: translateY(0px)   scale(1);    opacity: 0.75; }
+  50%       { transform: translateY(-9px) scale(1.25); opacity: 1;    }
+}
+@keyframes cosmic-orb-float-alt {
+  0%, 100% { transform: translateY(0px)  scale(1);    opacity: 0.6; }
+  50%       { transform: translateY(7px) scale(1.15); opacity: 1;   }
+}
+@keyframes cosmic-twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%       { opacity: 0.9;  }
+}
+@keyframes cosmic-outer-glow {
+  0%, 100% { opacity: 0.18; transform: scale(1); }
+  50%       { opacity: 0.30; transform: scale(1.03); }
+}
+@keyframes cosmic-scanline {
+  0%   { transform: rotate(0deg);   opacity: 0.7; }
+  80%  { transform: rotate(350deg); opacity: 0.7; }
+  100% { transform: rotate(360deg); opacity: 0.7; }
+}
+
+/* ring groups — transform-box keeps origin at SVG element centre */
+.cc-ring { transform-box: fill-box; transform-origin: center center; }
+.cc-ring-cw  { animation: cosmic-cw  linear infinite; }
+.cc-ring-ccw { animation: cosmic-ccw linear infinite; }
+
+.cc-glow { animation: cosmic-pulse-glow 3s ease-in-out infinite; }
+
+.cc-beam { animation: cosmic-beam 2.4s ease-in-out infinite; }
+
+.cc-orb        { position: absolute; border-radius: 50%; animation: cosmic-orb-float     ease-in-out infinite; }
+.cc-orb-alt    { position: absolute; border-radius: 50%; animation: cosmic-orb-float-alt ease-in-out infinite; }
+
+.cc-star { animation: cosmic-twinkle ease-in-out infinite; }
+
+.cc-outer-glow {
+  position: absolute; inset: -20%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,100,255,0.18) 0%, rgba(0,60,180,0.08) 50%, transparent 75%);
+  animation: cosmic-outer-glow 4s ease-in-out infinite;
+  pointer-events: none;
+}

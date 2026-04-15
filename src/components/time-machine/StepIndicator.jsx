@@ -2,7 +2,7 @@ import React from "react";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function StepIndicator({ currentStep, totalSteps, labels }) {
+export default function StepIndicator({ currentStep, totalSteps }) {
   return (
     <div className="flex items-center justify-center gap-2 mb-8">
       {Array.from({ length: totalSteps }).map((_, i) => {

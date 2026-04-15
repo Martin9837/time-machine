@@ -9,6 +9,9 @@ import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import AnimatedSplash from '@/components/home/AnimatedSplash';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { useState } from 'react';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -69,13 +72,17 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  const [splashDone, setSplashDone] = useState(false);
 
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
+        {!splashDone && <AnimatedSplash onDone={() => setSplashDone(true)} />}
         <Router>
           <NavigationTracker />
-          <AuthenticatedApp />
+          <ErrorBoundary>
+            <AuthenticatedApp />
+          </ErrorBoundary>
         </Router>
         <Toaster />
       </QueryClientProvider>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Users, MapPin, Sparkles, X, Send, MessageCircle, CheckCircle } from "lucide-react";
+import { Users, MapPin, Sparkles, X, Send, CheckCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const geocodeCity = async (city) => {
@@ -11,13 +11,13 @@ const geocodeCity = async (city) => {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`);
     const data = await res.json();
     if (data.length > 0) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-  } catch (_) {}
+  } catch {}
   return null;
 };
 
 function FlyTo({ coords }) {
   const map = useMap();
-  useEffect(() => { if (coords) map.flyTo(coords, 12, { animate: true, duration: 2.5 }); }, [coords]);
+  useEffect(() => { if (coords) map.flyTo(coords, 12, { animate: true, duration: 2.5 }); }, [coords, map]);
   return null;
 }
 
@@ -97,7 +97,7 @@ function MatchSheet({ match, myMemory, user, onClose, onRequestSent }) {
       });
       setStatus("sent");
       setTimeout(() => { onRequestSent?.(); onClose(); }, 1800);
-    } catch (e) {
+    } catch {
       setStatus("idle");
     }
   };
@@ -240,7 +240,7 @@ export default function GlobeRevealMap({ myMemory, allMemories = [], user, onCon
   const [pinsReady, setPinsReady] = useState(false);
   const [statusText, setStatusText] = useState("Scanning the globe...");
   const [selectedMatch, setSelectedMatch] = useState(null);
-  const [sentTo, setSentTo] = useState(new Set());
+  const [, setSentTo] = useState(new Set());
 
   // Stable match positions (computed once)
   const [matchPositions] = useState(() =>

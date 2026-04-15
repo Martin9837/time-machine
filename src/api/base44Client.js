@@ -102,12 +102,35 @@ const appLogs = {
   logUserInApp: () => Promise.resolve(),
 };
 
+// File storage helpers using Supabase Storage
+const storage = {
+  /**
+   * Upload a file to a Supabase storage bucket.
+   * Returns the public URL of the uploaded file.
+   */
+  upload: async (bucket, path, file) => {
+    const { error } = await supabase.storage.from(bucket).upload(path, file, {
+      upsert: true,
+      contentType: file.type,
+    });
+    if (error) throw error;
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    return data.publicUrl;
+  },
+
+  remove: async (bucket, paths) => {
+    const { error } = await supabase.storage.from(bucket).remove(paths);
+    if (error) throw error;
+  },
+};
+
 // Drop-in replacement for the Base44 client
 // Entities are accessed by name (e.g. base44.entities.TimeMemory)
 // and the name is lowercased to match the Supabase table name
 export const base44 = {
   auth,
   appLogs,
+  storage,
   entities: new Proxy({}, {
     get(_, entityName) {
       return createEntityHandler(entityName.toLowerCase());

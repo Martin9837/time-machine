@@ -82,14 +82,19 @@ export default function YearCityStep({ data, onChange }) {
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
               <Input
                 type="number"
-                min={1940}
+                min={data.year || 1940}
                 max={new Date().getFullYear()}
                 placeholder="1995"
                 value={data.year_end || ""}
                 onChange={(e) => onChange({ ...data, year_end: parseInt(e.target.value) || "" })}
-                className="pl-12 h-14 rounded-2xl border-gray-200 bg-white text-lg font-semibold focus:ring-violet-500 focus:border-violet-500"
+                className={`pl-12 h-14 rounded-2xl border-gray-200 bg-white text-lg font-semibold focus:ring-violet-500 focus:border-violet-500 ${
+                  data.year_end && data.year && data.year_end < data.year ? "border-red-400 focus:border-red-400 focus:ring-red-400" : ""
+                }`}
               />
             </div>
+            {data.year_end && data.year && data.year_end < data.year && (
+              <p className="text-xs text-red-500 mt-1 ml-1">&#34;To Year&#34; must be ≥ &#34;From Year&#34;</p>
+            )}
           </div>
         </div>
 
@@ -119,7 +124,7 @@ export default function YearCityStep({ data, onChange }) {
           <div className="relative">
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <Input
-              placeholder="e.g. Mumbai"
+              placeholder=""
               value={data.city || ""}
               onChange={(e) => onChange({ ...data, city: e.target.value })}
               className="pl-12 h-14 rounded-2xl border-gray-200 bg-white text-lg focus:ring-violet-500 focus:border-violet-500"
@@ -132,7 +137,7 @@ export default function YearCityStep({ data, onChange }) {
             Area / Locality <span className="text-gray-400 font-normal">(optional)</span>
           </Label>
           <Input
-            placeholder="e.g. Andheri West"
+            placeholder=""
             value={data.area || ""}
             onChange={(e) => onChange({ ...data, area: e.target.value })}
             className="h-14 rounded-2xl border-gray-200 bg-white text-lg focus:ring-violet-500 focus:border-violet-500"
@@ -143,6 +148,7 @@ export default function YearCityStep({ data, onChange }) {
       {showMap && (
         <LocationMapPicker
           position={mapPosition}
+          cityHint={data.city || ""}
           onLocationSelect={handleMapSelect}
           onClose={() => setShowMap(false)}
         />

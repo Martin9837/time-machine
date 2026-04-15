@@ -100,6 +100,7 @@ export default function PresentDayStep({ data, onChange }) {
       {showMap && (
         <LocationMapPicker
           position={mapPosition}
+          cityHint={data.current_city || ""}
           onLocationSelect={handleMapSelect}
           onClose={() => setShowMap(false)}
         />

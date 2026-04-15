@@ -70,7 +70,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Page content */}
-      <div className="page-scroll" style={{ flex: 1, paddingBottom: hideNav || !user ? 0 : 72 }}>
+      <div className="page-scroll" style={{ flex: 1, paddingTop: "env(safe-area-inset-top)", paddingBottom: hideNav || !user ? "env(safe-area-inset-bottom, 0px)" : 72 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

@@ -53,5 +53,7 @@
 	<string>Time Machine uses your location to show nearby memories and connect you with people who were in the same place.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Time Machine uses your location to show nearby memories and connect you with people who were in the same place.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +39,7 @@ const cityCoordinates = {
 function MapBounds({ matches }) {
   const map = useMap();
 
-  useMemo(() => {
+  useEffect(() => {
     if (matches.length > 0) {
       const bounds = matches.map((m) => {
         const city = m.city.toLowerCase().replace(/\s+/g, "");
@@ -102,12 +102,12 @@ export default function MapView({ matches, onSendRequest, sendingTo }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
         <MapBounds matches={matches} />
-        {matches.map((match, i) => {
+        {matches.map((match) => {
           const city = match.city.toLowerCase().replace(/\s+/g, "");
           const coords = cityCoordinates[city] || cityCoordinates.default;
 
           return (
-            <Marker key={i} position={coords} icon={createCustomIcon(match.score)}>
+            <Marker key={match.id} position={coords} icon={createCustomIcon(match.score)}>
               <Popup maxWidth={280} className="custom-popup">
                 <div className="p-2">
                   <div className="flex items-start justify-between mb-2">

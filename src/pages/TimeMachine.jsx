@@ -4,7 +4,7 @@ import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Rocket, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import StepIndicator from "../components/time-machine/StepIndicator";
 import YearCityStep from "../components/time-machine/YearCityStep";
 import ContextStep from "../components/time-machine/ContextStep";
@@ -40,7 +40,12 @@ export default function TimeMachine() {
   }, []);
 
   const canNext = () => {
-    if (step === 0) return data.year && data.city;
+    if (step === 0) {
+      if (!data.year || !data.city) return false;
+      // year_end is optional, but if provided must be >= year
+      if (data.year_end && data.year_end < data.year) return false;
+      return true;
+    }
     if (step === 1) return data.contexts.length > 0;
     if (step === 2) return true;
     if (step === 3) return data.nickname && data.current_city && data.open_to_connect !== null;
